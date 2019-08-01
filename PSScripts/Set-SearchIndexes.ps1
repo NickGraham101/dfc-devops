@@ -88,7 +88,7 @@ foreach ($Index in $IndexConfiguration) {
     $UpdatedFields = @()
 
     foreach ($i in $ExistingIndex.fields) {
-        $UpdatedFields += @{
+        $itemToUpdate = @{
             name = $i.name
             type = $i.type
             key = $i.key
@@ -101,6 +101,12 @@ foreach ($Index in $IndexConfiguration) {
             searchAnalyzer = $i.searchAnalyzer
             analyzer = $i.analyzer
         }
+
+        if($i.type -ieq "edm.complextype") {
+            $itemToUpdate["fields"] = $i.fields
+        }
+
+        $UpdatedFields += $itemToUpdate
     }
 
     foreach ($i in $Index.fields) {
