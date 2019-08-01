@@ -102,7 +102,7 @@ foreach ($Index in $IndexConfiguration) {
             analyzer = $i.analyzer
         }
 
-        if($i.type -ieq "edm.complextype") {
+        if($i.type -ieq "edm.complextype" -or $i.type -icontains "collection" ) {
             $itemToUpdate["fields"] = $i.fields
         }
 
@@ -122,7 +122,7 @@ foreach ($Index in $IndexConfiguration) {
         $UpdatedIndex = @{
             fields = $UpdatedFields
         }
-        ApiRequest -Method PUT -Url "$Url/$($Index.name)" -ApiKey $SearchResourceKeys.PrimaryKey -Body $UpdatedIndex
+        ApiRequest -ApiVersion 2019-05-06 -Method PUT -Url "$Url/$($Index.name)" -ApiKey $SearchResourceKeys.PrimaryKey -Body $UpdatedIndex
     }
     
 }
