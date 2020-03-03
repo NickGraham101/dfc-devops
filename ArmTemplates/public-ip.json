@@ -67,6 +67,10 @@
         "publicIpAddressId": {
             "type": "string",
             "value": "[resourceId('Microsoft.Network/publicIPAddresses', parameters('ipAddressName'))]"
+        },
+        "publicIpAddress": {
+            "type": "string",
+            "value": "[if(equals(parameters('allocationMethod'), 'Static'), reference(resourceId('Microsoft.Network/publicIPAddresses', parameters('ipAddressName')), '2018-10-01', 'Full').properties.ipAddress, '')]"
         }
     }
 }
