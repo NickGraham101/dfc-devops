@@ -1,5 +1,6 @@
 # GitVersion: if a GitVersion config file is required this should be stored at the root of the repo.  If the file doesn't exist GitVersion defaults will be used - https://gitversion.readthedocs.io/en/latest/
 parameters:
+  SolutionRootFolder: '' # must include final forward slash
   SolutionBaseName: ''
   BuildPlatform: 'any cpu'
   BuildConfiguration: 'release'
@@ -8,7 +9,7 @@ parameters:
   PublishWebApp: 'false'
   TestSuffix: Tests
   TestBranchFeaturesScriptUrl: https://raw.githubusercontent.com/SkillsFundingAgency/dfc-devops/master/PSScripts/Test-BranchFeatures.ps1
-  TestBranchFeaturesScriptFilePath: $(System.DefaultWorkingDirectory)\Test-BranchFeatures.ps1
+  TestBranchFeaturesScriptFilePath: $(System.DefaultWorkingDirectory)/Test-BranchFeatures.ps1
 
 steps:
  - task: PowerShell@2
@@ -56,15 +57,15 @@ steps:
    condition: not(${{ parameters.PublishWebApp }})
    inputs:
      command: 'build'
-     projects: '${{ parameters.SolutionBaseName }}\${{ parameters.SolutionBaseName }}.csproj'
-     arguments: '-o $(build.artifactstagingdirectory)\Build\  -c ${{ parameters.BuildConfiguration }}'
+     projects: '${{ parameters.SolutionRootFolder }}${{ parameters.SolutionBaseName }}/${{ parameters.SolutionBaseName }}.csproj'
+     arguments: '-o $(build.artifactstagingdirectory)/Build/  -c ${{ parameters.BuildConfiguration }}'
 
  - task: ArchiveFiles@2
    displayName: 'Archive Application'
    condition: not(${{ parameters.PublishWebApp }})
    inputs: 
-     rootFolderOrFile: $(build.artifactstagingdirectory)\Build\
-     archiveFile: $(build.artifactstagingdirectory)\Artifact\${{ parameters.SolutionBaseName }}\DeploymentPackages\$(SolutionBaseName).zip
+     rootFolderOrFile: $(build.artifactstagingdirectory)/Build/
+     archiveFile: $(build.artifactstagingdirectory)/Artifact/${{ parameters.SolutionBaseName }}/DeploymentPackages/$(SolutionBaseName).zip
      includeRootFolder: false
 
 # task to package a web app
@@ -73,15 +74,15 @@ steps:
    condition: ${{ parameters.PublishWebApp }}
    inputs:
      command: 'publish'
-     projects: '${{ parameters.SolutionBaseName }}\${{ parameters.SolutionBaseName }}.csproj'
-     arguments: '-o $(build.artifactstagingdirectory)\Artifact\${{ parameters.SolutionBaseName }}\DeploymentPackages\  -c ${{ parameters.BuildConfiguration }}'
+     projects: '${{ parameters.SolutionRootFolder }}${{ parameters.SolutionBaseName }}/${{ parameters.SolutionBaseName }}.csproj'
+     arguments: '-o $(build.artifactstagingdirectory)/Artifact/${{ parameters.SolutionBaseName }}/DeploymentPackages/  -c ${{ parameters.BuildConfiguration }}'
      publishWebProjects: false #set to false as this setting (which defaults to true) will parse the entire repo for web projects
 
  - task: DotNetCoreCLI@2
    displayName: Test
    inputs:
      command: test
-     projects: '${{ parameters.SolutionBaseName }}*${{ parameters.TestSuffix }}\${{ parameters.SolutionBaseName }}*${{ parameters.TestSuffix }}.csproj'
+     projects: '${{ parameters.SolutionRootFolder }}${{ parameters.SolutionBaseName }}*${{ parameters.TestSuffix }}/${{ parameters.SolutionBaseName }}*${{ parameters.TestSuffix }}.csproj'
      arguments: '--configuration ${{ parameters.BuildConfiguration }} --collect "Code coverage"'
 
  - task: SonarCloudAnalyze@1
@@ -91,5 +92,5 @@ steps:
  - task: PublishPipelineArtifact@1
    displayName: 'Publish Artifact: ${{ parameters.SolutionBaseName }}'
    inputs:
-     targetPath: $(build.artifactstagingdirectory)\Artifact\${{ parameters.SolutionBaseName }}\DeploymentPackages
+     targetPath: $(build.artifactstagingdirectory)/Artifact/${{ parameters.SolutionBaseName }}/DeploymentPackages
      artifactName: ${{ parameters.SolutionBaseName }}.DeploymentPackages

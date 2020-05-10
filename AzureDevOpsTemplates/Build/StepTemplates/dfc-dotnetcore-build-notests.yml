@@ -1,5 +1,6 @@
 # GitVersion: if a GitVersion config file is required this should be stored at the root of the repo.  If the file doesn't exist GitVersion defaults will be used - https://gitversion.readthedocs.io/en/latest/
 parameters:
+  SolutionRootFolder: '' # must include final forward slash
   SolutionBaseName: ''
   BuildPlatform: 'any cpu'
   BuildConfiguration: 'release'
@@ -27,15 +28,15 @@ steps:
    condition: not(${{ parameters.PublishWebApp }})
    inputs:
      command: 'build'
-     projects: '${{ parameters.SolutionBaseName }}\${{ parameters.SolutionBaseName }}.csproj'
-     arguments: '-o $(build.artifactstagingdirectory)\Build\${{ parameters.SolutionBaseName }}\ -c ${{ parameters.BuildConfiguration }}'
+     projects: '${{ parameters.SolutionRootFolder }}${{ parameters.SolutionBaseName }}/${{ parameters.SolutionBaseName }}.csproj'
+     arguments: '-o $(build.artifactstagingdirectory)/Build/${{ parameters.SolutionBaseName }}/ -c ${{ parameters.BuildConfiguration }}'
 
  - task: ArchiveFiles@2
    displayName: 'Archive Application ${{ parameters.SolutionBaseName }}'
    condition: not(${{ parameters.PublishWebApp }})
    inputs: 
-     rootFolderOrFile: $(build.artifactstagingdirectory)\Build\${{ parameters.SolutionBaseName }}
-     archiveFile: $(build.artifactstagingdirectory)\Artifact\${{ parameters.SolutionBaseName }}\DeploymentPackages\${{ parameters.SolutionBaseName }}.zip
+     rootFolderOrFile: $(build.artifactstagingdirectory)/Build/${{ parameters.SolutionBaseName }}
+     archiveFile: $(build.artifactstagingdirectory)/Artifact/${{ parameters.SolutionBaseName }}/DeploymentPackages/${{ parameters.SolutionBaseName }}.zip
      includeRootFolder: false
 
 # task to package a web app
@@ -44,12 +45,12 @@ steps:
    condition: ${{ parameters.PublishWebApp }}
    inputs:
      command: 'publish'
-     projects: '${{ parameters.SolutionBaseName }}\${{ parameters.SolutionBaseName }}.csproj'
-     arguments: '-o $(build.artifactstagingdirectory)\Artifact\${{ parameters.SolutionBaseName }}\DeploymentPackages\${{ parameters.SolutionBaseName }}\  -c ${{ parameters.BuildConfiguration }}'
+     projects: '${{ parameters.SolutionRootFolder }}${{ parameters.SolutionBaseName }}/${{ parameters.SolutionBaseName }}.csproj'
+     arguments: '-o $(build.artifactstagingdirectory)/Artifact/${{ parameters.SolutionBaseName }}/DeploymentPackages/${{ parameters.SolutionBaseName }}/  -c ${{ parameters.BuildConfiguration }}'
      publishWebProjects: false #set to false as this setting (which defaults to true) will parse the entire repo for web projects
 
  - task: PublishPipelineArtifact@1
    displayName: 'Publish Artifact: ${{ parameters.SolutionBaseName }}'
    inputs:
-     targetPath: $(build.artifactstagingdirectory)\Artifact\${{ parameters.SolutionBaseName }}\
+     targetPath: $(build.artifactstagingdirectory)/Artifact/${{ parameters.SolutionBaseName }}/
      artifactName: ${{ parameters.SolutionBaseName }}.DeploymentPackages
