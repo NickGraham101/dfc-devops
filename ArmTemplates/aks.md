@@ -52,9 +52,9 @@ agentPoolName (optional) string
 
 The name of the default agent pool.  Defaults to 'agentpool'.
 
-agentVMSize (optional) string
+agentVMSize (optional) array
 
-The sku of the machines that will be used for the default agentpool.  Defaults to 'Standard_DS2_v2'.
+The sku of the machines that will be used for the default agentpool.  Defaults to 'Standard_DS2_v2'.  If multiple SKUs are passed in each node pool will be of the same size.
 
 dockerBridgeCidr (optional) string
 

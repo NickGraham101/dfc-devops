@@ -79,8 +79,10 @@
             }
         },
         "agentVMSize": {
-            "type": "string",
-            "defaultValue": "Standard_DS2_v2",
+            "type": "array",
+            "defaultValue": [
+                "Standard_DS2_v2"
+            ],
             "metadata": {
                 "description": "The sku of the machines that will be used for the default agentpool."
             }
@@ -133,15 +135,19 @@
             "properties": {
                 "kubernetesVersion": "[parameters('kubernetesVersion')]",
                 "dnsPrefix": "[parameters('clusterName')]",
-                "agentPoolProfiles": [
+                "copy": [
                     {
-                        "name": "[parameters('agentPoolName')]",
-                        "count": "[parameters('agentNodeCount')]",
-                        "vmSize": "[parameters('agentVMSize')]",
-                        "osType": "Linux",
-                        "vnetSubnetID": "[variables('vnetSubnetID')]",
-                        "type": "VirtualMachineScaleSets",
-                        "storageProfile": "ManagedDisks"
+                        "name": "agentPoolProfiles",
+                        "count": "[length(parameters('agentVMSize'))]",
+                        "input": {
+                            "name": "[concat(parameters('agentPoolName'), '-', copyIndex('agentPoolProfiles'))]",
+                            "count": "[parameters('agentNodeCount')]",
+                            "vmSize": "[parameters('agentVMSize')[copyIndex('agentPoolProfiles')]]",
+                            "osType": "Linux",
+                            "vnetSubnetID": "[variables('vnetSubnetID')]",
+                            "type": "VirtualMachineScaleSets",
+                            "storageProfile": "ManagedDisks"
+                        }
                     }
                 ],
                 "addonProfiles": "[if(equals(parameters('logAnalyticsWorkspaceName'), ''), variables('addOnObject').noAddons, variables('addOnObject').omsAddon)]",
