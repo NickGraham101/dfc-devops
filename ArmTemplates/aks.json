@@ -121,21 +121,6 @@
             "properties": {
                 "kubernetesVersion": "[parameters('kubernetesVersion')]",
                 "dnsPrefix": "[parameters('clusterName')]",
-                "copy": [
-                    {
-                        "name": "agentPoolProfiles",
-                        "count": "[length(parameters('agentPools'))]",
-                        "input": {
-                            "name": "[parameters('agentPools')[copyIndex('agentPoolProfiles')].agentPoolName]",
-                            "count": "[parameters('agentPools')[copyIndex('agentPoolProfiles')].agentNodeCount]",
-                            "vmSize": "[parameters('agentPools')[copyIndex('agentPoolProfiles')].agentVMSize]",
-                            "osType": "Linux",
-                            "vnetSubnetID": "[variables('vnetSubnetID')]",
-                            "type": "VirtualMachineScaleSets",
-                            "storageProfile": "ManagedDisks"
-                        }
-                    }
-                ],
                 "addonProfiles": "[if(equals(parameters('logAnalyticsWorkspaceName'), ''), variables('addOnObject').noAddons, variables('addOnObject').omsAddon)]",
                 "nodeResourceGroup": "[parameters('nodeResourceGroup')]",
                 "enableRBAC": true,
@@ -156,6 +141,24 @@
                     "podCidr": "[parameters('podCidr')]",
                     "dockerBridgeCidr": "[parameters('dockerBridgeCidr')]"
                 }
+            }
+        },
+        {
+            "apiVersion": "2020-03-01",
+            "type": "Microsoft.ContainerService/managedClusters/agentPools",
+            "location": "[resourceGroup().location]",
+            "name": "[concat(parameters('clusterName'), '/agentPools/', parameters('agentPools')[copyIndex('agentPoolProfiles')].agentPoolName)]",
+            "properties": {
+                "count": "[parameters('agentPools')[copyIndex('agentPoolProfiles')].agentNodeCount]",
+                "vmSize": "[parameters('agentPools')[copyIndex('agentPoolProfiles')].agentVMSize]",
+                "osType": "Linux",
+                "vnetSubnetID": "[variables('vnetSubnetID')]",
+                "type": "VirtualMachineScaleSets",
+                "storageProfile": "ManagedDisks"
+            },
+            "copy": {
+                "name": "agentPoolProfiles",
+                "count": "[length(parameters('agentPools'))]"
             }
         }
     ],
