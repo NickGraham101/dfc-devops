@@ -147,7 +147,7 @@
             "apiVersion": "2020-03-01",
             "type": "Microsoft.ContainerService/managedClusters/agentPools",
             "location": "[resourceGroup().location]",
-            "name": "[concat(parameters('clusterName'), '/agentPools/', parameters('agentPools')[copyIndex('agentPoolProfiles')].agentPoolName)]",
+            "name": "[concat(parameters('clusterName'), '/', parameters('agentPools')[copyIndex('agentPoolProfiles')].agentPoolName)]",
             "properties": {
                 "count": "[parameters('agentPools')[copyIndex('agentPoolProfiles')].agentNodeCount]",
                 "vmSize": "[parameters('agentPools')[copyIndex('agentPoolProfiles')].agentVMSize]",
@@ -159,7 +159,10 @@
             "copy": {
                 "name": "agentPoolProfiles",
                 "count": "[length(parameters('agentPools'))]"
-            }
+            },
+            "dependsOn": [
+                "[parameters('clusterName')]"
+            ]
         }
     ],
     "outputs": {
