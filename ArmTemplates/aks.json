@@ -63,12 +63,12 @@
             }
         },
         "agentPools": {
-            "type": "object",
-            "defaultValue": {
+            "type": "array",
+            "defaultValue": [{
                 "agentNodeCount": 3,
                 "agentPoolName": "agentpool",
                 "agentVMSize": "Standard_DS2_v2"
-            },
+            }],
             "metadata": {
                 "description": "An object containing agentNodeCount, agentPoolName and agentVMSize properties"
             }

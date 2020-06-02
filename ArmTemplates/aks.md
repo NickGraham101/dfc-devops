@@ -44,7 +44,7 @@ virtualNetworkResourceGroup (required) string
 
 Name of the existing VNET resource group
 
-agentPools (optional) object
+agentPools (optional) array
 
 An object containing agentNodeCount, agentPoolName and agentVMSize properties
 agentNodeCount is number of nodes for the pool.  Defaults to 3, minimum of 1, maximum of 50.
