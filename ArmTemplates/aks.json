@@ -62,29 +62,15 @@
                 "description": "Name of the existing VNET resource group"
             }
         },
-        "agentNodeCount": {
-            "type": "int",
-            "defaultValue": 3,
-            "metadata": {
-                "description": "The number of nodes for the cluster."
+        "agentPools": {
+            "type": "object",
+            "defaultValue": {
+                "agentNodeCount": 3,
+                "agentPoolName": "agentpool",
+                "agentVMSize": "Standard_DS2_v2"
             },
-            "minValue": 1,
-            "maxValue": 50
-        },
-        "agentPoolName": {
-            "type": "string",
-            "defaultValue": "agentpool",
             "metadata": {
-                "description": "The name of the default agent pool"
-            }
-        },
-        "agentVMSize": {
-            "type": "array",
-            "defaultValue": [
-                "Standard_DS2_v2"
-            ],
-            "metadata": {
-                "description": "The sku of the machines that will be used for the default agentpool."
+                "description": "An object containing agentNodeCount, agentPoolName and agentVMSize properties"
             }
         },
         "dockerBridgeCidr": {
@@ -138,11 +124,11 @@
                 "copy": [
                     {
                         "name": "agentPoolProfiles",
-                        "count": "[length(parameters('agentVMSize'))]",
+                        "count": "[length(parameters('agentPools'))]",
                         "input": {
-                            "name": "[concat(parameters('agentPoolName'), '-', copyIndex('agentPoolProfiles'))]",
-                            "count": "[parameters('agentNodeCount')]",
-                            "vmSize": "[parameters('agentVMSize')[copyIndex('agentPoolProfiles')]]",
+                            "name": "[parameters('agentPools')[copyIndex('agentPoolProfiles')].agentPoolName]",
+                            "count": "[parameters('agentPools')[copyIndex('agentPoolProfiles')].agentNodeCount]",
+                            "vmSize": "[parameters('agentPools')[copyIndex('agentPoolProfiles')].agentVMSize]",
                             "osType": "Linux",
                             "vnetSubnetID": "[variables('vnetSubnetID')]",
                             "type": "VirtualMachineScaleSets",
