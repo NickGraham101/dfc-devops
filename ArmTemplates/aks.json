@@ -121,6 +121,15 @@
             "properties": {
                 "kubernetesVersion": "[parameters('kubernetesVersion')]",
                 "dnsPrefix": "[parameters('clusterName')]",
+                "agentPoolProfiles": [{
+                    "name": "[parameters('agentPools')[0].agentPoolName]",
+                    "count": "[parameters('agentPools')[0].agentNodeCount]",
+                    "vmSize": "[parameters('agentPools')[0].agentVMSize]",
+                    "osType": "Linux",
+                    "vnetSubnetID": "[variables('vnetSubnetID')]",
+                    "type": "VirtualMachineScaleSets",
+                    "storageProfile": "ManagedDisks"
+                }],
                 "addonProfiles": "[if(equals(parameters('logAnalyticsWorkspaceName'), ''), variables('addOnObject').noAddons, variables('addOnObject').omsAddon)]",
                 "nodeResourceGroup": "[parameters('nodeResourceGroup')]",
                 "enableRBAC": true,
