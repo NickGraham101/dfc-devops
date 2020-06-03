@@ -67,7 +67,8 @@
             "defaultValue": [{
                 "agentNodeCount": 3,
                 "agentPoolName": "agentpool",
-                "agentVMSize": "Standard_DS2_v2"
+                "agentVMSize": "Standard_DS2_v2",
+                "mode": "System"
             }],
             "metadata": {
                 "description": "An object containing agentNodeCount, agentPoolName and agentVMSize properties"
@@ -114,7 +115,7 @@
     },
     "resources": [
         {
-            "apiVersion": "2019-06-01",
+            "apiVersion": "2020-03-01",
             "type": "Microsoft.ContainerService/managedClusters",
             "location": "[resourceGroup().location]",
             "name": "[parameters('clusterName')]",
@@ -128,6 +129,7 @@
                     "osType": "Linux",
                     "vnetSubnetID": "[variables('vnetSubnetID')]",
                     "type": "VirtualMachineScaleSets",
+                    "mode": "[if(contains(parameters('agentPools')[0], 'mode'), parameters('agentPools')[0].mode, 'User')]",
                     "storageProfile": "ManagedDisks"
                 }],
                 "addonProfiles": "[if(equals(parameters('logAnalyticsWorkspaceName'), ''), variables('addOnObject').noAddons, variables('addOnObject').omsAddon)]",
@@ -153,7 +155,7 @@
             }
         },
         {
-            "apiVersion": "2019-06-01",
+            "apiVersion": "2020-03-01",
             "type": "Microsoft.ContainerService/managedClusters/agentPools",
             "location": "[resourceGroup().location]",
             "name": "[concat(parameters('clusterName'), '/', parameters('agentPools')[copyIndex('agentPoolProfiles')].agentPoolName)]",
@@ -163,6 +165,7 @@
                 "osType": "Linux",
                 "vnetSubnetID": "[variables('vnetSubnetID')]",
                 "type": "VirtualMachineScaleSets",
+                "mode": "[if(contains(parameters('agentPools')[copyIndex('agentPoolProfiles')], 'mode'), parameters('agentPools')[copyIndex('agentPoolProfiles')].mode, 'User')]",
                 "storageProfile": "ManagedDisks"
             },
             "copy": {
