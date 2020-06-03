@@ -67,8 +67,7 @@
             "defaultValue": [{
                 "agentNodeCount": 3,
                 "agentPoolName": "agentpool",
-                "agentVMSize": "Standard_DS2_v2",
-                "mode": "System"
+                "agentVMSize": "Standard_DS2_v2"
             }],
             "metadata": {
                 "description": "An object containing agentNodeCount, agentPoolName and agentVMSize properties"
@@ -155,7 +154,6 @@
                 "osType": "Linux",
                 "vnetSubnetID": "[variables('vnetSubnetID')]",
                 "type": "VirtualMachineScaleSets",
-                "mode": "[parameters('agentPools')[copyIndex('agentPoolProfiles')].mode]",
                 "storageProfile": "ManagedDisks"
             },
             "copy": {
