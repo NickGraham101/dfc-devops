@@ -54,7 +54,7 @@ steps:
    inputs:
      command: test
      projects: '${{ parameters.SolutionBaseName }}.${{ parameters.TestSuffix }}\${{ parameters.SolutionBaseName }}.${{ parameters.TestSuffix }}.csproj'
-     arguments: '--configuration ${{ parameters.BuildConfiguration }} --collect "Code coverage"'
+     arguments: '--configuration ${{ parameters.BuildConfiguration }} --collect:"XPlat Code Coverage"'
 
  - task: PublishPipelineArtifact@1
    displayName: 'Publish Artifact: ${{ parameters.SolutionBaseName }}'
