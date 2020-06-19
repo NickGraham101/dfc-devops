@@ -54,7 +54,7 @@ steps:
    displayName: 'Test - dotnet test application ${{ parameters.SolutionBaseName }}'
    inputs:
      command: test
-     projects: '${{ parameters.SolutionBaseName }}.${{ parameters.TestSuffix }}\${{ parameters.SolutionBaseName }}.${{ parameters.TestSuffix }}.csproj'
+     projects: '${{ parameters.SolutionRootFolder }}${{ parameters.SolutionBaseName }}.${{ parameters.TestSuffix }}\${{ parameters.SolutionBaseName }}.${{ parameters.TestSuffix }}.csproj'
      arguments: '--configuration ${{ parameters.BuildConfiguration }} --collect:"XPlat Code Coverage"'
 
  - task: PublishPipelineArtifact@1
