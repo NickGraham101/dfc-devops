@@ -83,7 +83,7 @@ steps:
    inputs:
      command: test
      projects: '${{ parameters.SolutionRootFolder }}${{ parameters.SolutionBaseName }}*${{ parameters.TestSuffix }}/${{ parameters.SolutionBaseName }}*${{ parameters.TestSuffix }}.csproj'
-     arguments: '--configuration ${{ parameters.BuildConfiguration }} --collect "Code coverage"'
+     arguments: '--configuration ${{ parameters.BuildConfiguration }}  --collect:"XPlat Code Coverage"'
 
  - task: SonarCloudAnalyze@1
    displayName: 'Run Code Analysis'
