@@ -44,17 +44,12 @@ virtualNetworkResourceGroup (required) string
 
 Name of the existing VNET resource group
 
-agentNodeCount (optional) int
+agentPools (optional) array
 
-The number of nodes for the cluster.  Defaults to 3, minimum of 1, maximum of 50.
-
-agentPoolName (optional) string
-
-The name of the default agent pool.  Defaults to 'agentpool'.
-
-agentVMSize (optional) string
-
-The sku of the machines that will be used for the default agentpool.  Defaults to 'Standard_DS2_v2'.
+An object containing agentNodeCount, agentPoolName, agentVMSize and mode properties
+agentNodeCount is number of nodes for the pool.  Defaults to 3, minimum of 1, maximum of 50.
+agentVMSize is the sku of the machines that will be used for the default agentpool.  Defaults to 'Standard_DS2_v2'.  If multiple SKUs are passed in each node pool will be of the same size.
+mode must be either System or User
 
 dockerBridgeCidr (optional) string
 

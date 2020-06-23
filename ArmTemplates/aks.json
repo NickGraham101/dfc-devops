@@ -62,27 +62,16 @@
                 "description": "Name of the existing VNET resource group"
             }
         },
-        "agentNodeCount": {
-            "type": "int",
-            "defaultValue": 3,
+        "agentPools": {
+            "type": "array",
+            "defaultValue": [{
+                "agentNodeCount": 3,
+                "agentPoolName": "agentpool",
+                "agentVMSize": "Standard_DS2_v2",
+                "mode": "System"
+            }],
             "metadata": {
-                "description": "The number of nodes for the cluster."
-            },
-            "minValue": 1,
-            "maxValue": 50
-        },
-        "agentPoolName": {
-            "type": "string",
-            "defaultValue": "agentpool",
-            "metadata": {
-                "description": "The name of the default agent pool"
-            }
-        },
-        "agentVMSize": {
-            "type": "string",
-            "defaultValue": "Standard_DS2_v2",
-            "metadata": {
-                "description": "The sku of the machines that will be used for the default agentpool."
+                "description": "An object containing agentNodeCount, agentPoolName and agentVMSize properties"
             }
         },
         "dockerBridgeCidr": {
@@ -126,24 +115,23 @@
     },
     "resources": [
         {
-            "apiVersion": "2019-06-01",
+            "apiVersion": "2020-03-01",
             "type": "Microsoft.ContainerService/managedClusters",
             "location": "[resourceGroup().location]",
             "name": "[parameters('clusterName')]",
             "properties": {
                 "kubernetesVersion": "[parameters('kubernetesVersion')]",
                 "dnsPrefix": "[parameters('clusterName')]",
-                "agentPoolProfiles": [
-                    {
-                        "name": "[parameters('agentPoolName')]",
-                        "count": "[parameters('agentNodeCount')]",
-                        "vmSize": "[parameters('agentVMSize')]",
-                        "osType": "Linux",
-                        "vnetSubnetID": "[variables('vnetSubnetID')]",
-                        "type": "VirtualMachineScaleSets",
-                        "storageProfile": "ManagedDisks"
-                    }
-                ],
+                "agentPoolProfiles": [{
+                    "name": "[parameters('agentPools')[0].agentPoolName]",
+                    "count": "[parameters('agentPools')[0].agentNodeCount]",
+                    "vmSize": "[parameters('agentPools')[0].agentVMSize]",
+                    "osType": "Linux",
+                    "vnetSubnetID": "[variables('vnetSubnetID')]",
+                    "type": "VirtualMachineScaleSets",
+                    "mode": "[if(contains(parameters('agentPools')[0], 'mode'), parameters('agentPools')[0].mode, 'User')]",
+                    "storageProfile": "ManagedDisks"
+                }],
                 "addonProfiles": "[if(equals(parameters('logAnalyticsWorkspaceName'), ''), variables('addOnObject').noAddons, variables('addOnObject').omsAddon)]",
                 "nodeResourceGroup": "[parameters('nodeResourceGroup')]",
                 "enableRBAC": true,
@@ -165,6 +153,28 @@
                     "dockerBridgeCidr": "[parameters('dockerBridgeCidr')]"
                 }
             }
+        },
+        {
+            "apiVersion": "2020-03-01",
+            "type": "Microsoft.ContainerService/managedClusters/agentPools",
+            "location": "[resourceGroup().location]",
+            "name": "[concat(parameters('clusterName'), '/', parameters('agentPools')[copyIndex('agentPoolProfiles')].agentPoolName)]",
+            "properties": {
+                "count": "[parameters('agentPools')[copyIndex('agentPoolProfiles')].agentNodeCount]",
+                "vmSize": "[parameters('agentPools')[copyIndex('agentPoolProfiles')].agentVMSize]",
+                "osType": "Linux",
+                "vnetSubnetID": "[variables('vnetSubnetID')]",
+                "type": "VirtualMachineScaleSets",
+                "mode": "[if(contains(parameters('agentPools')[copyIndex('agentPoolProfiles')], 'mode'), parameters('agentPools')[copyIndex('agentPoolProfiles')].mode, 'User')]",
+                "storageProfile": "ManagedDisks"
+            },
+            "copy": {
+                "name": "agentPoolProfiles",
+                "count": "[length(parameters('agentPools'))]"
+            },
+            "dependsOn": [
+                "[parameters('clusterName')]"
+            ]
         }
     ],
     "outputs": {
