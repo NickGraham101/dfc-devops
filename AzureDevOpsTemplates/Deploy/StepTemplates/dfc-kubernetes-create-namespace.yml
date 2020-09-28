@@ -1,8 +1,9 @@
 parameters:
-  AksResourceGroup: ''
-  AzureSubscription: ''
-  KubernetesCluster: ''
-  Namespace: ''
+  AksResourceGroup: 
+  AzureSubscription: 
+  KubernetesCluster: 
+  Namespace: 
+  PathToScripts: $(Pipeline.Workspace)/dfc-devops/PSCoreScripts/
 
 steps:
 - task: Kubernetes@1
@@ -20,7 +21,7 @@ steps:
   displayName: 'PowerShell: Output NamespaceExists'
   inputs:
     targetType: 'filePath'
-    filePath: $(Pipeline.Workspace)/scripts/Test-NamespaceExists.ps1
+    filePath: ${{ parameters.PathToScripts }}/Test-NamespaceExists.ps1
     arguments: -KubectlOutput '$(GetNamespaces.KubectlOutput)' -Namespace ${{ parameters.Namespace }} -Verbose
 - task: Kubernetes@1
   displayName: kubectl create ${{ parameters.Namespace }} namespace
