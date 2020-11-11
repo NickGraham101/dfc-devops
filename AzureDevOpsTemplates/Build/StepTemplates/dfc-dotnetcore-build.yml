@@ -5,6 +5,7 @@ parameters:
   BuildPlatform: 'any cpu'
   BuildConfiguration: 'release'
   DotNetCoreVersion: ''
+  GitVersionTargetPath: '/'
   IncludePreviewVersions: false
   PublishWebApp: 'false'
   TestSuffix: Tests
@@ -17,9 +18,10 @@ steps:
      version: ${{ parameters.DotNetCoreVersion }}
      IncludePreviewVersions: ${{ parameters.IncludePreviewVersions }}
 
- - task: gittools.gitversion.gitversion-task.GitVersion@5
-   displayName: GitVersion
+ - task: gittools.gittools.execute-gitversion-task.gitversion/execute@0
+   displayName: gitversion/execute
    inputs:
+     targetPath: ${{ parameters.GitVersionTargetPath }}
      useConfigFile: true
      configFilePath: GitVersion.yml
 
